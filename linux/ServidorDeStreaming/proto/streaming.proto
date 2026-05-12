@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package streaming;
+
+option go_package = "servidorstreaming/proto";
+
+// =====================================================
+// Servicio de Streaming de Audios
+// Permite al cliente listar y reproducir audios
+// mediante el envío de fragmentos (chunks)
+// =====================================================
+
+service AudioStreamingService {
+
+  // Retorna la lista de audios disponibles con sus metadatos
+  rpc ListarAudios (SolicitudListarAudios) returns (RespuestaListarAudios);
+
+  // Retorna los metadatos de un audio específico
+  rpc ObtenerMetadatosAudio (SolicitudMetadatos) returns (RespuestaMetadatos);
+
+  // Envía el audio en fragmentos - streaming servidor -> cliente
+  rpc ReproducirAudio (SolicitudReproduccion) returns (stream FragmentoAudio);
+}
+
+// --- ListarAudios ---
+message SolicitudListarAudios {
+  string solicitante = 1;
+}
+
+message RespuestaListarAudios {
+  repeated InfoAudio audios = 1;
+}
+
+message InfoAudio {
+  string nombreArchivo = 1;
+  string titulo        = 2;
+  string artista       = 3;
+  string genero        = 4;
+}
+
+// --- ObtenerMetadatosAudio ---
+message SolicitudMetadatos {
+  string nombreArchivo = 1;
+}
+
+message RespuestaMetadatos {
+  string nombreArchivo = 1;
+  string titulo        = 2;
+  string artista       = 3;
+  string genero        = 4;
+  int64  tamanoBytes   = 5;
+}
+
+// --- ReproducirAudio ---
+message SolicitudReproduccion {
+  string nombreArchivo   = 1;
+  string nicknameCliente = 2;
+}
+
+message FragmentoAudio {
+  bytes datos       = 1;
+  int32 numeroChunk = 2;
+  bool  esUltimo    = 3;
+}

@@ -1,0 +1,54 @@
+syntax = "proto3";
+
+package streaming;
+
+option go_package = "clientestreaming/proto";
+
+// =====================================================
+// Servicio de Streaming de Audios
+// Este archivo debe ser idéntico al del servidor
+// =====================================================
+
+service AudioStreamingService {
+  rpc ListarAudios (SolicitudListarAudios) returns (RespuestaListarAudios);
+  rpc ObtenerMetadatosAudio (SolicitudMetadatos) returns (RespuestaMetadatos);
+  rpc ReproducirAudio (SolicitudReproduccion) returns (stream FragmentoAudio);
+}
+
+message SolicitudListarAudios {
+  string solicitante = 1;
+}
+
+message RespuestaListarAudios {
+  repeated InfoAudio audios = 1;
+}
+
+message InfoAudio {
+  string nombreArchivo = 1;
+  string titulo        = 2;
+  string artista       = 3;
+  string genero        = 4;
+}
+
+message SolicitudMetadatos {
+  string nombreArchivo = 1;
+}
+
+message RespuestaMetadatos {
+  string nombreArchivo = 1;
+  string titulo        = 2;
+  string artista       = 3;
+  string genero        = 4;
+  int64  tamanoBytes   = 5;
+}
+
+message SolicitudReproduccion {
+  string nombreArchivo   = 1;
+  string nicknameCliente = 2;
+}
+
+message FragmentoAudio {
+  bytes datos       = 1;
+  int32 numeroChunk = 2;
+  bool  esUltimo    = 3;
+}
